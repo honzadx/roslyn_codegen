@@ -1,7 +1,7 @@
 using System;
 
 [AttributeUsage(AttributeTargets.Struct)]
-public class SimpleSerializeAttribute : System.Attribute {}
+public class SimpleSerializeAttribute : System.Attribute;
 
 [SimpleSerialize]
 public partial struct SerializedStruct

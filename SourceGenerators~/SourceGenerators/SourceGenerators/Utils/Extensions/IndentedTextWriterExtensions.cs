@@ -4,9 +4,9 @@ namespace SourceGenerators;
 
 public static class IndentedTextWriterExtensions
 {
-    public static IndentedTextScope Scope(this IndentedTextWriter self, string prefix = null, string postfix = null)
+    public static IndentedTextScope Scope(this IndentedTextWriter self, string prefix = null, string inlinePostix = null, string postfix = null)
     {
-        return new IndentedTextScope(self, prefix, postfix);
+        return new IndentedTextScope(self, prefix, inlinePostix, postfix);
     }
     
     public static void StartScope(this IndentedTextWriter self)
@@ -15,10 +15,15 @@ public static class IndentedTextWriterExtensions
         self.Indent++;
     }
     
-    public static void EndScope(this IndentedTextWriter self)
+    public static void EndScope(this IndentedTextWriter self, string inlinePostfix = null)
     {
+        string endScopeText = "}";
+        if (inlinePostfix != null)
+        {
+            endScopeText += inlinePostfix;
+        }
         self.Indent--;
-        self.WriteLine("}");
+        self.WriteLine(endScopeText);
     }
     
     public static void StartNamespaceScope(this IndentedTextWriter self, string namespaceName)

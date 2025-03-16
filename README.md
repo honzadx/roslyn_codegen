@@ -45,7 +45,7 @@ context.RegisterSourceOutput(provider, static (SourceProductionContext ctx, Tran
 - [x] Simple readable serialize (and slow)
     - [ ] Add async version
 - [x] Get and Set attributes
-- [ ] Clonable attribute
+- [x] Clonable attribute
 - [ ] Steal zig comptime 
 - [ ] Better serialize
 - [ ] Validators

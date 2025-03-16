@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace SourceGenerators;
 
 [Generator]
-public class EnumExtensionsSourceGenerator : IIncrementalGenerator
+public class FastEnumSourceGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -38,26 +38,24 @@ public class EnumExtensionsSourceGenerator : IIncrementalGenerator
         var namespaceName = syntax.GetNamespaceName();
         codeWriter.StartNamespaceScope(namespaceName);
 
-        using (codeWriter.Scope(prefix: $"public static class {syntax.Identifier.Text}Extensions"))
+        using (codeWriter.Scope(prefix: $"public static partial class {syntax.Identifier.Text}Extensions"))
         {
-            codeWriter.Write("internal static readonly ");
-            codeWriter.Write(syntax.Identifier.Text);
-            codeWriter.Write("[] values = new []") ;
-            codeWriter.WriteLine('{');
-            codeWriter.Indent++;
-            foreach (var member in syntax.Members)
+            using (codeWriter.Scope(
+                prefix: $"internal static readonly {syntax.Identifier.Text}[] values = new[]", 
+                inlinePostix: ";\n"))
             {
-                codeWriter.Write(syntax.Identifier.Text);
-                codeWriter.Write('.');
-                codeWriter.Write(member.Identifier.Text);
-                codeWriter.WriteLine(',');
+                foreach (var member in syntax.Members)
+                {
+                    codeWriter.Write(syntax.Identifier.Text);
+                    codeWriter.Write('.');
+                    codeWriter.Write(member.Identifier.Text);
+                    codeWriter.WriteLine(',');
+                }
             }
-            codeWriter.Indent--;
-            codeWriter.WriteLine("};\n");
             
             codeWriter.WriteLine("[MethodImpl(MethodImplOptions.AggressiveInlining)]");
             using (codeWriter.Scope(
-                prefix: $"public static {syntax.Identifier.Text}[] GetValues()",
+                prefix: $"public static {syntax.Identifier.Text}[] GetValues()", 
                 postfix: string.Empty))
             {
                 codeWriter.WriteLine("return values;");

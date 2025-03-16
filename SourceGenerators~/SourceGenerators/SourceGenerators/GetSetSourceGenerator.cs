@@ -20,7 +20,7 @@ public class GetterSetterSourceGenerator : IIncrementalGenerator
         public string namespaceName;
         public string name;
         public string typeDeclarationName;
-        public UsingDirectiveSyntax[] usingDirectives;
+        public List<UsingDirectiveSyntax> usingDirectives;
         public List<FieldMetadata> fields;
     }
 
@@ -57,7 +57,7 @@ public class GetterSetterSourceGenerator : IIncrementalGenerator
         metadata.fields = new List<FieldMetadata>();
         metadata.name = syntax.Identifier.ToString();
         metadata.namespaceName = syntax.GetNamespaceName();
-        metadata.usingDirectives = syntax.GetUsingDirectives().ToArray();
+        metadata.usingDirectives = [..syntax.GetUsingDirectives().ToArray()];
         
         if (!syntax.HasModifiers(["public", "partial"]))
         {
@@ -71,8 +71,8 @@ public class GetterSetterSourceGenerator : IIncrementalGenerator
             }
             FieldMetadata fieldMetadata = default;
             fieldMetadata.field = field;
-            fieldMetadata.hasSetAttribute = syntax.HasAttribute(SET_ATTRIBUTE_NAME, context);
-            fieldMetadata.hasGetAttribute = syntax.HasAttribute(GET_ATTRIBUTE_NAME, context);
+            fieldMetadata.hasSetAttribute = field.HasAttribute(SET_ATTRIBUTE_NAME, context);
+            fieldMetadata.hasGetAttribute = field.HasAttribute(GET_ATTRIBUTE_NAME, context);
             if (!fieldMetadata.hasGetAttribute && !fieldMetadata.hasSetAttribute)
             {
                 continue;
@@ -94,7 +94,7 @@ public class GetterSetterSourceGenerator : IIncrementalGenerator
         {
             codeWriter.WriteLine(usingDirective.ToString());
         }
-        if (metadata.usingDirectives.Length > 0)
+        if (metadata.usingDirectives.Count > 0)
         {
             codeWriter.WriteLine();
         }

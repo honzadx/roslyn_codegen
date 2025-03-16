@@ -7,11 +7,13 @@ public class IndentedTextScope : IDisposable
 {
     private IndentedTextWriter _writer;
     private readonly string _postfix;
+    private readonly string _inlinePostfix;
     
-    public IndentedTextScope(IndentedTextWriter writer, string prefix = null, string postfix = null)
+    public IndentedTextScope(IndentedTextWriter writer, string prefix = null, string inlinePostfix = null, string postfix = null)
     {
         _writer = writer;
         _postfix = postfix;
+        _inlinePostfix = inlinePostfix;
         
         if (prefix != null)
         {
@@ -29,7 +31,7 @@ public class IndentedTextScope : IDisposable
     {
         if (_writer != null)
         {
-            _writer.EndScope();
+            _writer.EndScope(_inlinePostfix);
             if (_postfix != null)
             {
                 _writer.WriteLine(_postfix);

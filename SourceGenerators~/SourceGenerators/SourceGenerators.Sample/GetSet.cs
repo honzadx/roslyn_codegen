@@ -2,9 +2,10 @@
 using System;
 
 [AttributeUsage(AttributeTargets.Field)]
-public class GetAttribute : System.Attribute {}
+public class GetAttribute : System.Attribute;
+
 [AttributeUsage(AttributeTargets.Field)]
-public class SetAttribute : System.Attribute {}
+public class SetAttribute : System.Attribute;
 
 namespace A.B.C
 {
