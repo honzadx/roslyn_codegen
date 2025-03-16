@@ -36,6 +36,7 @@ public class FastEnumSourceGenerator : IIncrementalGenerator
         codeWriter.WriteLine("using System.Runtime.CompilerServices;\n");
 
         var namespaceName = syntax.GetNamespaceName();
+        namespaceName = string.IsNullOrEmpty(namespaceName) ? "Generated" : $"{namespaceName}.Generated";
         codeWriter.StartNamespaceScope(namespaceName);
 
         using (codeWriter.Scope(prefix: $"public static partial class {syntax.Identifier.Text}Extensions"))

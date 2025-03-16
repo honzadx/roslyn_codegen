@@ -71,6 +71,7 @@ public class ClonableSourceGenerator : IIncrementalGenerator
         codeWriter.WriteLine("using System.Runtime.CompilerServices;\n");
         
         var namespaceName = metadata.namespaceName;
+        namespaceName = string.IsNullOrEmpty(namespaceName) ? "Generated" : $"{namespaceName}.Generated";
         codeWriter.StartNamespaceScope(namespaceName);
 
         using (codeWriter.Scope(prefix: $"public static partial class {metadata.name}Extensions"))
