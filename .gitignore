@@ -1,4 +1,6 @@
 .DS_Store
 .idea/
-*/bin/
-*/obj/
+/SourceGenerators~/SourceGenerators/SourceGenerators.Sample/bin/*
+/SourceGenerators~/SourceGenerators/SourceGenerators.Sample/obj/*
+/SourceGenerators~/SourceGenerators/SourceGenerators/bin/*
+/SourceGenerators~/SourceGenerators/SourceGenerators/obj/*

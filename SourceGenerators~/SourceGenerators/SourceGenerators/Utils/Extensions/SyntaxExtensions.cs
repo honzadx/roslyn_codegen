@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -39,6 +40,17 @@ internal static class SyntaxExtensions
         return target;
     }
     
+    public static IEnumerable<T> GetChildrenOfType<T>(this SyntaxNode self) where T : SyntaxNode
+    {
+        foreach (var node in self.ChildNodes())
+        {
+            if (node is T target)
+            {
+                yield return target;
+            }
+        }
+    }
+    
     public static string GetNamespaceName(this SyntaxNode self)
     {
         var ancestorCount = 0;
@@ -73,6 +85,21 @@ internal static class SyntaxExtensions
         return sb.ToString();
     }
     
+    public static bool HasAttribute<T>(this T self, string attributeName, GeneratorSyntaxContext context) where T : BaseTypeDeclarationSyntax
+    {
+        return HasAttribute(self.AttributeLists, attributeName, context);
+    }
+    
+    public static bool HasAttribute(this FieldDeclarationSyntax self, string attributeName, GeneratorSyntaxContext context)
+    {
+        return HasAttribute(self.AttributeLists, attributeName, context);
+    }
+    
+    public static bool HasAttribute(this MethodDeclarationSyntax self, string attributeName, GeneratorSyntaxContext context)
+    {
+        return HasAttribute(self.AttributeLists, attributeName, context);
+    }
+    
     public static bool HasAttribute(SyntaxList<AttributeListSyntax> attributeLists, string attributeName, GeneratorSyntaxContext context)
     {
         foreach (var attributeList in attributeLists)
@@ -90,6 +117,16 @@ internal static class SyntaxExtensions
         }
         return false;
     }
+    
+    public static bool HasModifiers<T>(this T self, string[] modifierNames) where T : BaseTypeDeclarationSyntax
+    {
+        return HasModifiers(self.Modifiers, modifierNames);
+    }
+
+    public static bool HasModifier<T>(this T self, string modifierName) where T : BaseTypeDeclarationSyntax
+    {
+        return HasModifier(self.Modifiers, modifierName);
+    }
 
     public static bool HasModifier(SyntaxTokenList modifiers, string modifierName)
     {
@@ -102,7 +139,22 @@ internal static class SyntaxExtensions
         }
         return false;
     }
-
+    
+    public static bool HasModifiers(SyntaxTokenList modifiers, string[] modifierNames)
+    {
+        int matchingModifierCount = 0;
+        foreach (var modifierName in modifierNames)
+        foreach (var modifier in modifiers)
+        {
+            if (modifier.ToString() == modifierName)
+            {
+                matchingModifierCount++;
+                break;
+            }
+        }
+        return matchingModifierCount == modifierNames.Length;
+    }
+    
     public static bool HasBaseType(BaseListSyntax baseList, string baseTypeName)
     {
         foreach (var type in baseList.Types)

@@ -23,7 +23,7 @@ public class EnumExtensionsSourceGenerator : IIncrementalGenerator
     private static EnumDeclarationSyntax Transform(GeneratorSyntaxContext context)
     {
         var syntax = (EnumDeclarationSyntax)context.Node;
-        return SyntaxExtensions.HasAttribute(syntax.AttributeLists, "System.FlagsAttribute", context) ? syntax : null;
+        return syntax.HasAttribute("System.FlagsAttribute", context) ? syntax : null;
     }
 
     private static void GenerateCode(SourceProductionContext context, EnumDeclarationSyntax syntax)

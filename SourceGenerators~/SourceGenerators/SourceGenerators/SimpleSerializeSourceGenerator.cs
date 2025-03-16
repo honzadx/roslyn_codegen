@@ -1,4 +1,3 @@
-using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
@@ -14,7 +13,7 @@ namespace SourceGenerators;
 [Generator]
 public class SimpleSerializeSourceGenerator : IIncrementalGenerator
 {
-    private const string ATTRIBUTE_NAME = "SimpleSerializeAttribute";
+    private const string SIMPLE_SERIALIZE_ATTRIBUTE_NAME = "SimpleSerializeAttribute";
 
     private static readonly string[] serializedTypes = { "bool", "int", "float" };
     private static readonly Dictionary<string, char> typeToToken = new ()
@@ -38,15 +37,12 @@ public class SimpleSerializeSourceGenerator : IIncrementalGenerator
     private static StructDeclarationSyntax Transform(GeneratorSyntaxContext context)
     {
         var syntax = (StructDeclarationSyntax)context.Node;
-        var modifiers = syntax.Modifiers;
-        var isPublic = SyntaxExtensions.HasModifier(modifiers, "public");
-        var isPartial = SyntaxExtensions.HasModifier(modifiers, "partial");
 
-        if (!isPublic || !isPartial)
+        if (!syntax.HasModifiers(["public", "partial"]))
         {
             return null;
         }
-        if (!SyntaxExtensions.HasAttribute(syntax.AttributeLists, ATTRIBUTE_NAME, context))
+        if (!syntax.HasAttribute(SIMPLE_SERIALIZE_ATTRIBUTE_NAME, context))
         {
             return null;
         }

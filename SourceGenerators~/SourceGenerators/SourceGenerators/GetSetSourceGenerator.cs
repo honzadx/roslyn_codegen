@@ -12,11 +12,14 @@ namespace SourceGenerators;
 [Generator]
 public class GetterSetterSourceGenerator : IIncrementalGenerator
 {
+    private const string GET_ATTRIBUTE_NAME = "GetAttribute";
+    private const string SET_ATTRIBUTE_NAME = "SetAttribute";
+    
     struct Metadata
     {
         public string namespaceName;
         public string name;
-        public string typeDefinitionName;
+        public string typeDeclarationName;
         public UsingDirectiveSyntax[] usingDirectives;
         public List<FieldMetadata> fields;
     }
@@ -44,19 +47,19 @@ public class GetterSetterSourceGenerator : IIncrementalGenerator
         Metadata metadata = default;
         if (context.Node is ClassDeclarationSyntax)
         {
-            metadata.typeDefinitionName = "class";
+            metadata.typeDeclarationName = "class";
         }
         else if (context.Node is StructDeclarationSyntax)
         {
-            metadata.typeDefinitionName = "struct";
+            metadata.typeDeclarationName = "struct";
         }
         var syntax = (TypeDeclarationSyntax)context.Node;
         metadata.fields = new List<FieldMetadata>();
         metadata.name = syntax.Identifier.ToString();
         metadata.namespaceName = syntax.GetNamespaceName();
         metadata.usingDirectives = syntax.GetUsingDirectives().ToArray();
-        var isPublic = SyntaxExtensions.HasModifier(syntax.Modifiers, "public");
-        if (!isPublic)
+        
+        if (!syntax.HasModifiers(["public", "partial"]))
         {
             return metadata;
         }
@@ -66,11 +69,10 @@ public class GetterSetterSourceGenerator : IIncrementalGenerator
             {
                 continue;
             }
-            var attributeLists = field.AttributeLists;
             FieldMetadata fieldMetadata = default;
             fieldMetadata.field = field;
-            fieldMetadata.hasSetAttribute = SyntaxExtensions.HasAttribute(attributeLists, "SetAttribute", context);
-            fieldMetadata.hasGetAttribute = SyntaxExtensions.HasAttribute(attributeLists, "GetAttribute", context);
+            fieldMetadata.hasSetAttribute = syntax.HasAttribute(SET_ATTRIBUTE_NAME, context);
+            fieldMetadata.hasGetAttribute = syntax.HasAttribute(GET_ATTRIBUTE_NAME, context);
             if (!fieldMetadata.hasGetAttribute && !fieldMetadata.hasSetAttribute)
             {
                 continue;
@@ -100,7 +102,7 @@ public class GetterSetterSourceGenerator : IIncrementalGenerator
         var namespaceName = metadata.namespaceName;
         codeWriter.StartNamespaceScope(namespaceName);
 
-        using (codeWriter.Scope(prefix: $"partial {metadata.typeDefinitionName} {metadata.name}"))
+        using (codeWriter.Scope(prefix: $"partial {metadata.typeDeclarationName} {metadata.name}"))
         {
             for (int i = 0, length = metadata.fields.Count; i < length; i++)
             {
